@@ -75,15 +75,14 @@ jsdoc.dump(data, "output.jsdoc")
 
 - Comments are removed before JSON parsing.
 - Triple-quoted values are converted into JSON strings.
-- By default, whitespace inside triple-quoted blocks is normalized.
-- Use `preserve_newlines=True` to keep line breaks.
+- By default, line breaks inside triple-quoted blocks are preserved.
+- Use `collapse_whitespace=True` to normalize all whitespace into single spaces.
 
 ```python
 import jsdoc
 
 value = jsdoc.loads(
     '{ text: """line 1\nline 2\nline 3""" }',
-    preserve_newlines=True,
 )
 
 print(value["text"])
@@ -106,8 +105,8 @@ For standard JSON syntax problems (for example trailing commas), Python’s `jso
 
 ## API
 
-- `jsdoc.loads(text, *, preserve_newlines=False, **kwargs)`
-- `jsdoc.load(path, *, preserve_newlines=False, encoding="utf-8", **kwargs)`
+- `jsdoc.loads(text, *, collapse_whitespace=False, **kwargs)`
+- `jsdoc.load(path, *, collapse_whitespace=False, encoding="utf-8", **kwargs)`
 - `jsdoc.dumps(data, *, indent=2, threshold=80)`
 - `jsdoc.dump(data, path, *, indent=2, threshold=80, encoding="utf-8")`
 

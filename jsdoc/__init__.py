@@ -4,10 +4,10 @@ import re
 from .errors import JSDocError, JSDocParseError
 
 try:
-    from ._cython_backend import preprocess as _preprocess
+    from ._cython_backend import preprocess as _preprocess, replace_placeholders as _replace
     USING_CYTHON_BACKEND = True
 except Exception:
-    from ._python_backend import preprocess as _preprocess
+    from ._python_backend import preprocess as _preprocess, replace_placeholders as _replace
     USING_CYTHON_BACKEND = False
 
 __all__ = [
@@ -23,20 +23,28 @@ __all__ = [
 _PREPROCESS_MARKERS = ("\"\"\"", "//", "/*")
 
 
-def loads(text, *, preserve_newlines=False, **kwargs):
+def loads(text, *, collapse_whitespace=False, **kwargs):
     """Parse a jsdoc string. Extra kwargs pass through to json.loads."""
     if any(marker in text for marker in _PREPROCESS_MARKERS):
-        return json.loads(_preprocess(text, preserve_newlines), **kwargs)
+        preprocessed, replacements = _preprocess(text, collapse_whitespace)
+        data = json.loads(preprocessed, **kwargs)
+        if replacements:
+            data = _replace(data, replacements)
+        return data
     try:
         return json.loads(text, **kwargs)
     except json.JSONDecodeError:
-        return json.loads(_preprocess(text, preserve_newlines), **kwargs)
+        preprocessed, replacements = _preprocess(text, collapse_whitespace)
+        data = json.loads(preprocessed, **kwargs)
+        if replacements:
+            data = _replace(data, replacements)
+        return data
 
 
-def load(path, *, preserve_newlines=False, encoding="utf-8", **kwargs):
+def load(path, *, collapse_whitespace=False, encoding="utf-8", **kwargs):
     """Load and parse a .jsdoc file."""
     with open(path, "r", encoding=encoding) as f:
-        return loads(f.read(), preserve_newlines=preserve_newlines, **kwargs)
+        return loads(f.read(), collapse_whitespace=collapse_whitespace, **kwargs)
 
 
 # --- Dump back to .jsdoc ---

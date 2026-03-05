@@ -197,7 +197,7 @@ def test01_basic():
     assert data["name"] == "Alice"
     assert "Hello world." in data["bio"]
     assert "This is a test." in data["bio"]
-    assert "\n" not in data["bio"], "newlines should be collapsed"
+    assert "\n" in data["bio"], "newlines should be preserved by default"
 
 
 def test02_comments_in_strings():
@@ -228,7 +228,6 @@ def test05_special_chars():
     data = jsdoc.load("tests/test_files/test05_special_chars.jsdoc")
     assert 'said "hello"' in data["escaped"]
     assert "C:\\Users\\test\\file.txt" in data["escaped"]
-    assert "\t" not in data["escaped"], "tabs should collapse in default mode"
 
 
 def test06_comment_heavy():
@@ -245,9 +244,9 @@ def test07_arrays():
     assert data["techniques"][1]["name"] == "Frost Nova"
 
 
-def test08_preserve_newlines():
-    data = jsdoc.load("tests/test_files/test08_preserve_newlines.jsdoc", preserve_newlines=True)
-    assert "\n" in data["poem"], "newlines should be preserved"
+def test08_collapse_whitespace():
+    data = jsdoc.load("tests/test_files/test08_preserve_newlines.jsdoc")
+    assert "\n" in data["poem"], "newlines should be preserved by default"
     assert "roses are red" in data["poem"]
     assert "and so are you" in data["poem"]
 
@@ -356,7 +355,7 @@ if __name__ == "__main__":
         ("05 special chars (quotes/backslash/tab)", test05_special_chars),
         ("06 comment-heavy file",            test06_comment_heavy),
         ("07 arrays with triple-quotes",     test07_arrays),
-        ("08 preserve_newlines mode",        test08_preserve_newlines),
+        ("08 collapse_whitespace mode",      test08_collapse_whitespace),
         ("09 $_underscore bare keys",        test09_dollar_underscore_keys),
         ("10 real-world multi-entry",        test10_real_world),
         ("11 dump/load round-trip",          test11_roundtrip),

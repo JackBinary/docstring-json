@@ -102,37 +102,35 @@ def _validate_triple_quote_delimiters(raw):
         raise JSDocParseError("Unclosed triple-quoted string in jsdoc input.")
 
 
-def _extract_triple_quotes(raw, preserve_newlines=False):
+def _extract_triple_quotes(raw, collapse_whitespace=False):
     _validate_triple_quote_delimiters(raw)
-    replacements = []
+    replacements = {}
 
     def replacer(match):
         inner = match.group(1)
         inner = inner.strip('"')
-        if preserve_newlines:
-            inner = inner.strip()
-        else:
+        if collapse_whitespace:
             inner = " ".join(inner.split())
+        else:
+            inner = inner.strip()
 
-        escaped = inner
-        escaped = escaped.replace('\\', '\\\\')
-        escaped = escaped.replace('"', '\\"')
-        escaped = escaped.replace('\n', '\\n')
-        escaped = escaped.replace('\r', '\\r')
-        escaped = escaped.replace('\t', '\\t')
-
-        placeholder = f'__JSDOC_TQ_{len(replacements)}__'
-        replacements.append('"' + escaped + '"')
-        return placeholder
+        key = f'__JSDOC_TQ_{len(replacements)}__'
+        replacements[key] = inner
+        return '"' + key + '"'
 
     text = _TRIPLE_QUOTE_RE.sub(replacer, raw)
     return text, replacements
 
 
-def _restore_triple_quotes(text, replacements):
-    for i, value in enumerate(replacements):
-        text = text.replace(f'__JSDOC_TQ_{i}__', value)
-    return text
+def replace_placeholders(data, replacements):
+    """Walk parsed data and swap placeholder strings for original content."""
+    if isinstance(data, dict):
+        return {k: replace_placeholders(v, replacements) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [replace_placeholders(item, replacements) for item in data]
+    elif isinstance(data, str) and data in replacements:
+        return replacements[data]
+    return data
 
 
 def _strip_comments(text):
@@ -175,9 +173,8 @@ def _quote_bare_keys(text):
     return _BARE_KEY_RE.sub(lambda m: f' "{m.group(1)}" ', text)
 
 
-def preprocess(raw, preserve_newlines=False):
-    text, replacements = _extract_triple_quotes(raw, preserve_newlines)
+def preprocess(raw, collapse_whitespace=False):
+    text, replacements = _extract_triple_quotes(raw, collapse_whitespace)
     text = _strip_comments(text)
     text = _quote_bare_keys(text)
-    text = _restore_triple_quotes(text, replacements)
-    return text
+    return text, replacements
