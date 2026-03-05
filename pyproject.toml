@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "docstring-json"
-version = "0.2.1"
+version = "0.2.2"
 description = "A Python library for parsing JSON with comments, unquoted keys, and docstrings (.djson files)."
 readme = "README.md"
 license = {text = "MIT"}
