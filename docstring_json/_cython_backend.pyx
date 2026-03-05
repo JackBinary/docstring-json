@@ -1,27 +1,28 @@
 import re
 
-from .errors import JSDocParseError
+from .errors import DjsonParseError
 
-_TRIPLE_QUOTE_RE = re.compile(r'(?<!")"{3}(.*?)"{3}(?!")', re.DOTALL)
-_BARE_KEY_RE = re.compile(r'(?<=[{,])\s*([A-Za-z_$][A-Za-z0-9_$]*)\s*(?=:)')
+cdef object _TRIPLE_QUOTE_RE = re.compile(r'(?<!")"{3}(.*?)"{3}(?!")', re.DOTALL)
+cdef object _BARE_KEY_RE = re.compile(r'(?<=[{,])\s*([A-Za-z_$][A-Za-z0-9_$]*)\s*(?=:)')
 
 
-def _count_consecutive_quotes(text, start):
-    end = start
-    length = len(text)
+def _count_consecutive_quotes(str text, int start):
+    cdef int end = start
+    cdef int length = len(text)
     while end < length and text[end] == '"':
         end += 1
     return end - start
 
 
-def _validate_triple_quote_delimiters(raw):
-    """Ensure triple-quote delimiters are balanced and have valid quote counts."""
-    i = 0
-    length = len(raw)
-    in_string = False
-    in_line_comment = False
-    in_block_comment = False
-    in_triple_quote = False
+def _validate_triple_quote_delimiters(str raw):
+    cdef int i = 0
+    cdef int length = len(raw)
+    cdef bint in_string = False
+    cdef bint in_line_comment = False
+    cdef bint in_block_comment = False
+    cdef bint in_triple_quote = False
+    cdef int quote_count
+    cdef int delimiter_groups
 
     while i < length:
         if in_line_comment:
@@ -42,7 +43,7 @@ def _validate_triple_quote_delimiters(raw):
             if i + 2 < length and raw[i:i + 3] == '"""':
                 quote_count = _count_consecutive_quotes(raw, i)
                 if quote_count % 3 != 0:
-                    raise JSDocParseError(
+                    raise DjsonParseError(
                         f"Invalid triple-quote delimiter length ({quote_count}) at index {i}. "
                         "Triple-quoted strings must use balanced groups of exactly three quotes."
                     )
@@ -79,7 +80,7 @@ def _validate_triple_quote_delimiters(raw):
         if i + 2 < length and raw[i:i + 3] == '"""':
             quote_count = _count_consecutive_quotes(raw, i)
             if quote_count % 3 != 0:
-                raise JSDocParseError(
+                raise DjsonParseError(
                     f"Invalid triple-quote delimiter length ({quote_count}) at index {i}. "
                     "Triple-quoted strings must use balanced groups of exactly three quotes."
                 )
@@ -99,30 +100,31 @@ def _validate_triple_quote_delimiters(raw):
         i += 1
 
     if in_triple_quote:
-        raise JSDocParseError("Unclosed triple-quoted string in jsdoc input.")
+        raise DjsonParseError("Unclosed triple-quoted string in djson input.")
 
 
-def _extract_triple_quotes(raw, collapse_whitespace=False):
+def _extract_triple_quotes(str raw, bint collapse_whitespace=False):
+    cdef dict replacements = {}
+    cdef str inner
     _validate_triple_quote_delimiters(raw)
-    replacements = {}
 
     def replacer(match):
         inner = match.group(1)
         inner = inner.strip('"')
         if collapse_whitespace:
-            inner = " ".join(inner.split())
+            inner2 = " ".join(inner.split())
         else:
-            inner = inner.strip()
+            inner2 = inner.strip()
 
-        key = f'__JSDOC_TQ_{len(replacements)}__'
-        replacements[key] = inner
+        key = f'__DJSON_TQ_{len(replacements)}__'
+        replacements[key] = inner2
         return '"' + key + '"'
 
     text = _TRIPLE_QUOTE_RE.sub(replacer, raw)
     return text, replacements
 
 
-def replace_placeholders(data, replacements):
+def replace_placeholders(data, dict replacements):
     """Walk parsed data and swap placeholder strings for original content."""
     if isinstance(data, dict):
         return {k: replace_placeholders(v, replacements) for k, v in data.items()}
@@ -133,10 +135,10 @@ def replace_placeholders(data, replacements):
     return data
 
 
-def _strip_comments(text):
-    result = []
-    i = 0
-    length = len(text)
+def _strip_comments(str text):
+    cdef list result = []
+    cdef int i = 0
+    cdef int length = len(text)
 
     while i < length:
         if text[i] == '"':
@@ -169,11 +171,11 @@ def _strip_comments(text):
     return ''.join(result)
 
 
-def _quote_bare_keys(text):
+def _quote_bare_keys(str text):
     return _BARE_KEY_RE.sub(lambda m: f' "{m.group(1)}" ', text)
 
 
-def preprocess(raw, collapse_whitespace=False):
+def preprocess(str raw, bint collapse_whitespace=False):
     text, replacements = _extract_triple_quotes(raw, collapse_whitespace)
     text = _strip_comments(text)
     text = _quote_bare_keys(text)

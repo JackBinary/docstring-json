@@ -1,10 +1,10 @@
-# jsdoc Format and Behavior Specification
+# docstring-json Format and Behavior Specification
 
 ## 1. Purpose
 
-`jsdoc` is a Python library for reading and writing JSON-like documents that support authoring-friendly extensions over strict JSON.
+`docstring-json` is a Python library for reading and writing JSON-like documents that support authoring-friendly extensions over strict JSON.
 
-At parse time, `jsdoc` preprocesses source text and then delegates final decoding to Python's built-in `json` parser.
+At parse time, `docstring-json` preprocesses source text and then delegates final decoding to Python's built-in `json` parser.
 
 ## 2. Data Model
 
@@ -20,7 +20,7 @@ No custom runtime node types are introduced.
 
 ## 3. Supported Syntax Extensions
 
-In addition to standard JSON syntax, `jsdoc` accepts the following extensions.
+In addition to standard JSON syntax, `docstring-json` accepts the following extensions.
 
 ### 3.1 JavaScript-style comments
 
@@ -86,7 +86,7 @@ This ordering guarantees that comment stripping and bare-key quoting do not alte
 
 ### 5.1 `loads(text, *, collapse_whitespace=False, **kwargs)`
 
-Parses jsdoc text to Python data.
+Parses djson text to Python data.
 
 - If the text contains any of `"""`, `//`, or `/*`, preprocessing is always run first.
 - Otherwise, `json.loads` is attempted directly.
@@ -99,7 +99,7 @@ Reads a file and delegates to `loads`.
 
 ### 5.3 `dumps(data, *, indent=2, threshold=80)`
 
-Serializes Python data to jsdoc-like text.
+Serializes Python data to djson-like text.
 
 Behavior:
 
@@ -123,26 +123,26 @@ Writes `dumps(...)` output to a file.
 
 Custom exceptions:
 
-- `JSDocError`: base class
-- `JSDocParseError`: preprocessing/format validation error
+- `DjsonError`: base class
+- `DjsonParseError`: preprocessing/format validation error
 
-`JSDocParseError` is raised for invalid triple-quote delimiter structure (uneven or unclosed triple-quoted blocks).
+`DjsonParseError` is raised for invalid triple-quote delimiter structure (uneven or unclosed triple-quoted blocks).
 
 JSON syntax errors that remain after preprocessing (for example trailing commas) propagate as `json.JSONDecodeError`.
 
 ## 7. Backend Selection
 
-At import time, `jsdoc` attempts to use a Cython backend (`jsdoc._cython_backend`) for preprocessing.
+At import time, `docstring-json` attempts to use a Cython backend (`docstring_json._cython_backend`) for preprocessing.
 
 - On success: `USING_CYTHON_BACKEND = True`
-- On failure: Python backend (`jsdoc._python_backend`) is used and `USING_CYTHON_BACKEND = False`
+- On failure: Python backend (`docstring_json._python_backend`) is used and `USING_CYTHON_BACKEND = False`
 
 Both backends implement equivalent preprocessing behavior.
 
 ## 8. Compatibility Notes
 
 - Strict JSON files are valid input.
-- `.jsdoc` is a convention; parser behavior is content-based.
+- `.djson` is a convention; parser behavior is content-based.
 - Trailing commas are not supported (same as standard JSON).
 - Unclosed block comments are not explicitly validated during preprocessing; such input may fail later during JSON decode.
 

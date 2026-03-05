@@ -25,4 +25,4 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e .
     - name: Run tests
-      run: python -m tests.test_jsdoc
+      run: python -m tests.test_djson

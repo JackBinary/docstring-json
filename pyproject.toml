@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0", "wheel", "Cython>=3.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "jsdoc"
-version = "0.2.0"
-description = "A Python library for parsing JSON with comments and bare keys (.jsdoc files)"
+name = "docstring-json"
+version = "0.2.1"
+description = "A Python library for parsing JSON with comments, unquoted keys, and docstrings (.djson files)."
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.6"
@@ -15,7 +15,7 @@ authors = [
 maintainers = [
     {name = "JackBinary", email = "jmg.exe@gmail.com"},
 ]
-keywords = ["json", "comments", "parser", "jsdoc"]
+keywords = ["json", "comments", "parser", "djson", "docstring-json"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -33,13 +33,13 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/JackBinary/jsdoc"
-Repository = "https://github.com/JackBinary/jsdoc"
-Issues = "https://github.com/JackBinary/jsdoc/issues"
+Homepage = "https://github.com/JackBinary/docstring-json"
+Repository = "https://github.com/JackBinary/docstring-json"
+Issues = "https://github.com/JackBinary/docstring-json/issues"
 
 [tool.setuptools]
-packages = ["jsdoc"]
+packages = ["docstring_json"]
 package-dir = {"" = "."}
 
 [tool.setuptools.package-data]
-jsdoc = ["*.jsdoc", "*.pyx"]
+docstring_json = ["*.djson", "*.pyx"]

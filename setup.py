@@ -9,8 +9,8 @@ def _build_extensions():
 
     extensions = [
         Extension(
-            "jsdoc._cython_backend",
-            ["jsdoc/_cython_backend.pyx"],
+            "docstring_json._cython_backend",
+            ["docstring_json/_cython_backend.pyx"],
             optional=True,
         )
     ]

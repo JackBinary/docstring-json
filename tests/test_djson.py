@@ -1,4 +1,4 @@
-import jsdoc
+import docstring_json
 import json
 import os
 import sys
@@ -10,19 +10,19 @@ os.chdir(os.path.dirname(os.path.dirname(__file__)))
 # --- Test file contents ---
 
 FILES = {
-    "test01_basic.jsdoc": """{
+    "test01_basic.djson": """{
   // a comment
   name: "Alice",
   bio: \"\"\"\n    Hello world.\n    This is a test.\n  \"\"\"
 }""",
 
-    "test02_comments_in_strings.jsdoc": """{
+    "test02_comments_in_strings.djson": """{
   "url": "https://example.com/path",
   "regex": "match /* this */ and // that",
   "code": \"\"\"\n    <code>let x = 1; // not a comment</code>\n    <code>let y = /* also not */ 2;</code>\n  \"\"\"
 }""",
 
-    "test03_nested_bare_keys.jsdoc": """{
+    "test03_nested_bare_keys.djson": """{
   characters: {
     hero: {
       name: "Kael",
@@ -43,18 +43,18 @@ FILES = {
   }
 }""",
 
-    "test04_empty_and_short_tq.jsdoc": """{
+    "test04_empty_and_short_tq.djson": """{
   "empty": \"\"\"\"\"\",
   "just_spaces": \"\"\"     \"\"\",
   "one_word": \"\"\"hello\"\"\",
   "one_line": \"\"\"this has no newlines at all\"\"\"
 }""",
 
-    "test05_special_chars.jsdoc": """{
+    "test05_special_chars.djson": """{
   "escaped": \"\"\"\n    She said "hello" and then left.\n    Path: C:\\Users\\test\\file.txt\n    Tab\tseparated\tvalues\n  \"\"\"
 }""",
 
-    "test06_comment_heavy.jsdoc": """{
+    "test06_comment_heavy.djson": """{
   // top-level comment
 
   /* 
@@ -69,7 +69,7 @@ FILES = {
   value: 42 // trailing
 }""",
 
-    "test07_arrays.jsdoc": """{
+    "test07_arrays.djson": """{
   tags: ["fire", "ice", "lightning"],
   techniques: [
     {
@@ -83,18 +83,18 @@ FILES = {
   ]
 }""",
 
-    "test08_preserve_newlines.jsdoc": """{
+    "test08_preserve_newlines.djson": """{
   poem: \"\"\"\n    roses are red\n    violets are blue\n    this parser is cool\n    and so are you\n  \"\"\"
 }""",
 
-    "test09_dollar_underscore_keys.jsdoc": """{
+    "test09_dollar_underscore_keys.djson": """{
   _private: "yes",
   $cost: 9.99,
   __dunder__: "python vibes",
   normal_key_99: true
 }""",
 
-    "test10_real_world.jsdoc": """{
+    "test10_real_world.djson": """{
   // ==================
   // TECHNIQUE DATABASE
   // ==================
@@ -155,22 +155,22 @@ def run_test(name, fn):
 def check_files_exist():
     """Ensure all test files exist on disk."""
     expected_files = [
-        "test01_basic.jsdoc",
-        "test02_comments_in_strings.jsdoc",
-        "test03_nested_bare_keys.jsdoc",
-        "test04_empty_and_short_tq.jsdoc",
-        "test05_special_chars.jsdoc",
-        "test06_comment_heavy.jsdoc",
-        "test07_arrays.jsdoc",
-        "test08_preserve_newlines.jsdoc",
-        "test09_dollar_underscore_keys.jsdoc",
-        "test10_real_world.jsdoc",
-        "test12_comments_edge_cases.jsdoc",
-        "test13_bare_keys_edge.jsdoc",
-        "test14_triple_quotes_edge.jsdoc",
-        "test15_invalid_trailing_comma.jsdoc",
-        "test16_deep_nesting.jsdoc",
-        "test17_empty_structures.jsdoc",
+        "test01_basic.djson",
+        "test02_comments_in_strings.djson",
+        "test03_nested_bare_keys.djson",
+        "test04_empty_and_short_tq.djson",
+        "test05_special_chars.djson",
+        "test06_comment_heavy.djson",
+        "test07_arrays.djson",
+        "test08_preserve_newlines.djson",
+        "test09_dollar_underscore_keys.djson",
+        "test10_real_world.djson",
+        "test12_comments_edge_cases.djson",
+        "test13_bare_keys_edge.djson",
+        "test14_triple_quotes_edge.djson",
+        "test15_invalid_trailing_comma.djson",
+        "test16_deep_nesting.djson",
+        "test17_empty_structures.djson",
     ]
     missing = []
     for filename in expected_files:
@@ -185,7 +185,7 @@ def check_files_exist():
 
 def cleanup_roundtrip():
     """Clean up the roundtrip test file."""
-    path = os.path.join("tests", "test_files", "test10_roundtrip.jsdoc")
+    path = os.path.join("tests", "test_files", "test10_roundtrip.djson")
     if os.path.exists(path):
         os.remove(path)
 
@@ -193,7 +193,7 @@ def cleanup_roundtrip():
 # --- Tests ---
 
 def test01_basic():
-    data = jsdoc.load("tests/test_files/test01_basic.jsdoc")
+    data = docstring_json.load("tests/test_files/test01_basic.djson")
     assert data["name"] == "Alice"
     assert "Hello world." in data["bio"]
     assert "This is a test." in data["bio"]
@@ -201,7 +201,7 @@ def test01_basic():
 
 
 def test02_comments_in_strings():
-    data = jsdoc.load("tests/test_files/test02_comments_in_strings.jsdoc")
+    data = docstring_json.load("tests/test_files/test02_comments_in_strings.djson")
     assert data["url"] == "https://example.com/path"
     assert "/* this */" in data["regex"]
     assert "// that" in data["regex"]
@@ -210,14 +210,14 @@ def test02_comments_in_strings():
 
 
 def test03_nested_bare_keys():
-    data = jsdoc.load("tests/test_files/test03_nested_bare_keys.jsdoc")
+    data = docstring_json.load("tests/test_files/test03_nested_bare_keys.djson")
     assert data["characters"]["hero"]["name"] == "Kael"
     assert data["characters"]["villain"]["stats"]["str"] == 16
     assert data["characters"]["hero"]["stats"]["wis"] == 8
 
 
 def test04_empty_and_short_tq():
-    data = jsdoc.load("tests/test_files/test04_empty_and_short_tq.jsdoc")
+    data = docstring_json.load("tests/test_files/test04_empty_and_short_tq.djson")
     assert data["empty"] == ""
     assert data["just_spaces"] == ""
     assert data["one_word"] == "hello"
@@ -225,19 +225,19 @@ def test04_empty_and_short_tq():
 
 
 def test05_special_chars():
-    data = jsdoc.load("tests/test_files/test05_special_chars.jsdoc")
+    data = docstring_json.load("tests/test_files/test05_special_chars.djson")
     assert 'said "hello"' in data["escaped"]
     assert "C:\\Users\\test\\file.txt" in data["escaped"]
 
 
 def test06_comment_heavy():
-    data = jsdoc.load("tests/test_files/test06_comment_heavy.jsdoc")
+    data = docstring_json.load("tests/test_files/test06_comment_heavy.djson")
     assert data["name"] == "test"
     assert data["value"] == 42
 
 
 def test07_arrays():
-    data = jsdoc.load("tests/test_files/test07_arrays.jsdoc")
+    data = docstring_json.load("tests/test_files/test07_arrays.djson")
     assert data["tags"] == ["fire", "ice", "lightning"]
     assert len(data["techniques"]) == 2
     assert "<strong>fire</strong>" in data["techniques"][0]["desc"]
@@ -245,14 +245,14 @@ def test07_arrays():
 
 
 def test08_collapse_whitespace():
-    data = jsdoc.load("tests/test_files/test08_preserve_newlines.jsdoc")
+    data = docstring_json.load("tests/test_files/test08_preserve_newlines.djson")
     assert "\n" in data["poem"], "newlines should be preserved by default"
     assert "roses are red" in data["poem"]
     assert "and so are you" in data["poem"]
 
 
 def test09_dollar_underscore_keys():
-    data = jsdoc.load("tests/test_files/test09_dollar_underscore_keys.jsdoc")
+    data = docstring_json.load("tests/test_files/test09_dollar_underscore_keys.djson")
     assert data["_private"] == "yes"
     assert data["$cost"] == 9.99
     assert data["__dunder__"] == "python vibes"
@@ -260,7 +260,7 @@ def test09_dollar_underscore_keys():
 
 
 def test10_real_world():
-    data = jsdoc.load("tests/test_files/test10_real_world.jsdoc")
+    data = docstring_json.load("tests/test_files/test10_real_world.djson")
     assert "Battle in the Mind" in data
     assert "Quick Draw" in data
     assert "Field Medic" in data
@@ -269,14 +269,14 @@ def test10_real_world():
 
 
 def test11_roundtrip():
-    original = jsdoc.load("tests/test_files/test10_real_world.jsdoc")
-    jsdoc.dump(original, "tests/test_files/test10_roundtrip.jsdoc")
-    reloaded = jsdoc.load("tests/test_files/test10_roundtrip.jsdoc")
+    original = docstring_json.load("tests/test_files/test10_real_world.djson")
+    docstring_json.dump(original, "tests/test_files/test10_roundtrip.djson")
+    reloaded = docstring_json.load("tests/test_files/test10_roundtrip.djson")
     assert original == reloaded, "round-trip data mismatch"
 
 
 def test12_comments_edge_cases():
-    data = jsdoc.load("tests/test_files/test12_comments_edge_cases.jsdoc")
+    data = docstring_json.load("tests/test_files/test12_comments_edge_cases.djson")
     assert data["name"] == "test"
     assert data["value"] == 42
     assert data["array"] == ["item1", "item2"]
@@ -284,7 +284,7 @@ def test12_comments_edge_cases():
 
 
 def test13_bare_keys_edge():
-    data = jsdoc.load("tests/test_files/test13_bare_keys_edge.jsdoc")
+    data = docstring_json.load("tests/test_files/test13_bare_keys_edge.djson")
     assert data["_underscore"] == "yes"
     assert data["$dollar"] == "yes"
     assert data["key123"] == "numbers"
@@ -296,7 +296,7 @@ def test13_bare_keys_edge():
 
 
 def test14_triple_quotes_edge():
-    data = jsdoc.load("tests/test_files/test14_triple_quotes_edge.jsdoc")
+    data = docstring_json.load("tests/test_files/test14_triple_quotes_edge.djson")
     assert "multiple lines" in data["multiline"]
     assert "// not a comment" in data["multiline"]
     assert "/* not a comment */" in data["multiline"]
@@ -307,20 +307,20 @@ def test14_triple_quotes_edge():
 
 def test15_invalid_trailing_comma():
     try:
-        jsdoc.load("tests/test_files/test15_invalid_trailing_comma.jsdoc")
+        docstring_json.load("tests/test_files/test15_invalid_trailing_comma.djson")
         assert False, "Should have failed due to trailing comma"
     except json.JSONDecodeError:
         pass  # Expected
 
 
 def test16_deep_nesting():
-    data = jsdoc.load("tests/test_files/test16_deep_nesting.jsdoc")
+    data = docstring_json.load("tests/test_files/test16_deep_nesting.djson")
     assert data["level1"]["level2"]["level3"]["level4"]["deep"] == "value"
     assert data["array"][0]["nested"][0]["deep"] == "array value"
 
 
 def test17_empty_structures():
-    data = jsdoc.load("tests/test_files/test17_empty_structures.jsdoc")
+    data = docstring_json.load("tests/test_files/test17_empty_structures.djson")
     assert data["empty_obj"] == {}
     assert data["empty_arr"] == []
     assert data["nested_empty"]["empty"] == {}
@@ -333,9 +333,9 @@ def test18_invalid_uneven_triple_quotes():
 
   for bad_input in (invalid_seven, invalid_five):
     try:
-      jsdoc.loads(bad_input)
+      docstring_json.loads(bad_input)
       assert False, "Should have failed due to uneven triple quotes"
-    except jsdoc.JSDocParseError:
+    except docstring_json.DjsonParseError:
       pass
 
 

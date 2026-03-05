@@ -1,15 +1,15 @@
-# jsdoc
-[![Tests](https://github.com/JackBinary/jsdoc/actions/workflows/tests.yml/badge.svg)](https://github.com/JackBinary/jsdoc/actions/workflows/tests.yml)
-[![Security](https://github.com/JackBinary/jsdoc/actions/workflows/security.yml/badge.svg)](https://github.com/JackBinary/jsdoc/actions/workflows/security.yml)
-[![Build](https://github.com/JackBinary/jsdoc/actions/workflows/build.yml/badge.svg)](https://github.com/JackBinary/jsdoc/actions/workflows/build.yml)
+# docstring-json
+[![Tests](https://github.com/JackBinary/docstring-json/actions/workflows/tests.yml/badge.svg)](https://github.com/JackBinary/docstring-json/actions/workflows/tests.yml)
+[![Security](https://github.com/JackBinary/docstring-json/actions/workflows/security.yml/badge.svg)](https://github.com/JackBinary/docstring-json/actions/workflows/security.yml)
+[![Build](https://github.com/JackBinary/docstring-json/actions/workflows/build.yml/badge.svg)](https://github.com/JackBinary/docstring-json/actions/workflows/build.yml)
 
-`jsdoc` is a Python parser for **JSON with comments and docstrings**.
+`docstring-json` is a Python parser for **JSON with comments and docstrings**.
 
 It lets you keep human-friendly documentation directly inside JSON-like files while still loading data into normal Python dictionaries and lists.
 
-## Why jsdoc?
+## Why docstring-json?
 
-Standard JSON is strict and does not allow comments or multiline doc-style strings. `jsdoc` extends JSON with practical authoring features:
+Standard JSON is strict and does not allow comments or multiline doc-style strings. `docstring-json` extends JSON with practical authoring features:
 
 - JavaScript-style comments (`//` and `/* ... */`)
 - Bare keys (unquoted identifiers)
@@ -20,7 +20,7 @@ After preprocessing, the content is parsed with Python’s built-in `json` parse
 ## Installation
 
 ```bash
-pip install jsdoc
+pip install docstring-json
 ```
 
 ## Quick Start
@@ -28,7 +28,7 @@ pip install jsdoc
 ### Parse from a string
 
 ```python
-import jsdoc
+import docstring_json
 
 text = """
 {
@@ -44,7 +44,7 @@ text = """
 }
 """
 
-data = jsdoc.loads(text)
+data = docstring_json.loads(text)
 print(data["title"])
 print(data["description"])
 ```
@@ -52,23 +52,23 @@ print(data["description"])
 ### Parse from a file
 
 ```python
-import jsdoc
+import docstring_json
 
-data = jsdoc.load("config.jsdoc")
+data = docstring_json.load("config.djson")
 print(data)
 ```
 
-### Dump data back to .jsdoc
+### Dump data back to .djson
 
 ```python
-import jsdoc
+import docstring_json
 
 data = {
     "name": "Field Manual",
     "notes": "This is a long block of descriptive text.",
 }
 
-jsdoc.dump(data, "output.jsdoc")
+docstring_json.dump(data, "output.djson")
 ```
 
 ## Comment and Docstring Behavior
@@ -79,9 +79,9 @@ jsdoc.dump(data, "output.jsdoc")
 - Use `collapse_whitespace=True` to normalize all whitespace into single spaces.
 
 ```python
-import jsdoc
+import docstring_json
 
-value = jsdoc.loads(
+value = docstring_json.loads(
     '{ text: """line 1\nline 2\nline 3""" }',
 )
 
@@ -90,25 +90,25 @@ print(value["text"])
 
 ## Error Handling
 
-`jsdoc` raises custom parse errors for malformed jsdoc syntax such as uneven or unclosed triple-quote delimiters.
+`docstring-json` raises custom parse errors for malformed djson syntax such as uneven or unclosed triple-quote delimiters.
 
 ```python
-import jsdoc
+import docstring_json
 
 try:
-    jsdoc.loads('{ bad: """"" }')
-except jsdoc.JSDocParseError as exc:
-    print(f"Invalid jsdoc: {exc}")
+    docstring_json.loads('{ bad: """"" }')
+except docstring_json.DjsonParseError as exc:
+    print(f"Invalid djson: {exc}")
 ```
 
 For standard JSON syntax problems (for example trailing commas), Python’s `json.JSONDecodeError` is raised.
 
 ## API
 
-- `jsdoc.loads(text, *, collapse_whitespace=False, **kwargs)`
-- `jsdoc.load(path, *, collapse_whitespace=False, encoding="utf-8", **kwargs)`
-- `jsdoc.dumps(data, *, indent=2, threshold=80)`
-- `jsdoc.dump(data, path, *, indent=2, threshold=80, encoding="utf-8")`
+- `docstring_json.loads(text, *, collapse_whitespace=False, **kwargs)`
+- `docstring_json.load(path, *, collapse_whitespace=False, encoding="utf-8", **kwargs)`
+- `docstring_json.dumps(data, *, indent=2, threshold=80)`
+- `docstring_json.dump(data, path, *, indent=2, threshold=80, encoding="utf-8")`
 
 ## Use Cases
 

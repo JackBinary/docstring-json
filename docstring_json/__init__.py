@@ -1,7 +1,7 @@
 import json
 import re
 
-from .errors import JSDocError, JSDocParseError
+from .errors import DjsonError, DjsonParseError
 
 try:
     from ._cython_backend import preprocess as _preprocess, replace_placeholders as _replace
@@ -11,8 +11,8 @@ except Exception:
     USING_CYTHON_BACKEND = False
 
 __all__ = [
-    "JSDocError",
-    "JSDocParseError",
+    "DjsonError",
+    "DjsonParseError",
     "USING_CYTHON_BACKEND",
     "load",
     "loads",
@@ -24,7 +24,7 @@ _PREPROCESS_MARKERS = ("\"\"\"", "//", "/*")
 
 
 def loads(text, *, collapse_whitespace=False, **kwargs):
-    """Parse a jsdoc string. Extra kwargs pass through to json.loads."""
+    """Parse a djson string. Extra kwargs pass through to json.loads."""
     if any(marker in text for marker in _PREPROCESS_MARKERS):
         preprocessed, replacements = _preprocess(text, collapse_whitespace)
         data = json.loads(preprocessed, **kwargs)
@@ -42,7 +42,7 @@ def loads(text, *, collapse_whitespace=False, **kwargs):
 
 
 def load(path, *, collapse_whitespace=False, encoding="utf-8", **kwargs):
-    """Load and parse a .jsdoc file."""
+    """Load and parse a .djson file."""
     with open(path, "r", encoding=encoding) as f:
         return loads(f.read(), collapse_whitespace=collapse_whitespace, **kwargs)
 
@@ -54,7 +54,7 @@ def _needs_triple_quote(value, threshold=80):
 
 
 def dumps(data, *, indent=2, threshold=80):
-    """Serialize a dict back to jsdoc format."""
+    """Serialize a dict back to djson format."""
     normal_json = json.dumps(data, indent=indent, ensure_ascii=False)
 
     def upgrade(match):
@@ -73,7 +73,7 @@ def dumps(data, *, indent=2, threshold=80):
 
 
 def dump(data, path, *, indent=2, threshold=80, encoding="utf-8"):
-    """Write a dict to a .jsdoc file."""
+    """Write a dict to a .djson file."""
     with open(path, "w", encoding=encoding) as f:
         f.write(dumps(data, indent=indent, threshold=threshold))
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) < 2:
-        print("Usage: python jsdoc.py <file.jsdoc>")
+        print("Usage: python -m docstring_json <file.djson>")
         sys.exit(1)
     data = load(sys.argv[1])
     print(json.dumps(data, indent=2, ensure_ascii=False))
